@@ -114,10 +114,10 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(1) h1', 20, 0);
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(2) h1', 200, 0, '<', 'ms');
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(3) h1', 30, 0);
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(4) h1', 99.9, 0, '', '%', true);
+            this.animateCounter('.perfomance-container .perfomance-item:nth-child(1) h1', 24, 0);
+            this.animateCounter('.perfomance-container .perfomance-item:nth-child(2) h1', 700, 0, '<', 'ms');
+            this.animateCounter('.perfomance-container .perfomance-item:nth-child(3) h1', 8, 0);
+            this.animateCounter('.perfomance-container .perfomance-item:nth-child(4) h1', 99.98, 0, '', '%', true);
             
             
             this.performanceObserver?.unobserve(entry.target);
@@ -156,7 +156,7 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
       const current = start + (target - start) * easeProgress;
       
       if (isDecimal) {
-        element.textContent = prefix + current.toFixed(1) + suffix;
+        element.textContent = prefix + current.toFixed(2) + suffix;
       } else {
         element.textContent = prefix + Math.floor(current) + suffix;
       }
