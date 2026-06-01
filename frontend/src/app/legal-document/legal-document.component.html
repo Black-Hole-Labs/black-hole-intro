@@ -1,0 +1,58 @@
+<div class="page-container legal-page">
+	<div class="main">
+		<app-header></app-header>
+
+		<div class="text">
+			<p class="tag">[ {{ config.tag }} ]</p>
+			<h1>{{ config.title }}</h1>
+			<div class="icon scroll-down"></div>
+			<div class="post">
+				<p>LAST UPDATED: JUNE 1, 2026</p>
+			</div>
+		</div>
+		<div class="background"></div>
+	</div>
+
+	<main class="legal-content">
+		<p *ngIf="isLoading" class="document-status">Loading document...</p>
+		<p *ngIf="loadError" class="document-status">The document could not be loaded. Please refresh the page.</p>
+		<div *ngIf="!isLoading && !loadError" class="document-body" [innerHTML]="documentHtml"></div>
+	</main>
+
+	<footer>
+		<div class="footer-grid">
+			<div class="footer-column">
+				<p class="footer-title">Resources</p>
+				<a href="https://docs.delora.build/about" target="_blank" rel="noopener noreferrer">Documentation</a>
+				<a href="/mediakit">MediaKit</a>
+				<a href="/terms-of-service">Terms of Service</a>
+				<a href="/privacy-notice">Privacy Notice</a>
+				<a href="/developer-license-agreement">Developer License Agreement</a>
+			</div>
+			<div class="footer-column">
+				<p class="footer-title">Social Media</p>
+				<a href="https://x.com/deloraprotocol" target="_blank" rel="noopener noreferrer">Twitter / X</a>
+				<a href="https://t.me/deloraprotocol" target="_blank" rel="noopener noreferrer">Telegram</a>
+				<a href="https://medium.com/@deloraprotocol" target="_blank" rel="noopener noreferrer">Medium</a>
+				<a href="https://www.linkedin.com/company/deloraprotocol" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+			</div>
+			<div class="footer-column">
+				<p class="footer-title">Developers</p>
+				<a href="https://docs.delora.build/api-reference" target="_blank" rel="noopener noreferrer">API</a>
+				<a href="/execution">Architecture</a>
+				<a href="https://github.com/orgs/DeloraProtocol/repositories" target="_blank" rel="noopener noreferrer">GitHub</a>
+			</div>
+			<div class="footer-column">
+				<p class="footer-title">Tools</p>
+				<a href="https://status.delora.build" target="_blank" rel="noopener noreferrer">Status</a>
+				<a href="https://portal.delora.build" target="_blank" rel="noopener noreferrer">Partner Portal</a>
+			</div>
+		</div>
+
+		<div class="bottom-text">
+			<div class="logo-img1"></div>
+			<p>Delora Labs © 2026. All right reserved.</p>
+		</div>
+		<div class="background"></div>
+	</footer>
+</div>
