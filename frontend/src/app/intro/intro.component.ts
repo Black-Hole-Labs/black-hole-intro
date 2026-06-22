@@ -1,8 +1,10 @@
-import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, Renderer2 } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit, ViewChild, ElementRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { TypingAnimationService } from '../services/typing-animation.service';
 import { TitleAnimationService } from '../services/title-animation.service';
+import { DeloraPerformanceStats, DeloraStatsService } from '../services/delora-stats.service';
 import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
@@ -18,23 +20,51 @@ import { HeaderComponent } from '../shared/header/header.component';
 		'./intro.component.adaptives.scss'
 	],
 })
-export class IntroComponent implements AfterViewInit, OnDestroy {
+export class IntroComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('description') descriptionEl!: ElementRef<HTMLElement>;
 	@ViewChild('description2') description2El!: ElementRef<HTMLElement>;
 	@ViewChild('description3') description3El!: ElementRef<HTMLElement>;
+
+  performanceStats: Partial<DeloraPerformanceStats> = {};
+
+  get supportedChainsTag(): string {
+    const supportedBlockchains = this.performanceStats.supportedBlockchains;
+
+    return supportedBlockchains === undefined
+      ? '[ Supported Chains ]'
+      : `[ ${supportedBlockchains} Supported Chains ]`;
+  }
 
   private isDragging = false;
   private startX = 0;
   private scrollLeft = 0;
   private performanceObserver?: IntersectionObserver;
+  private performanceStatsSubscription?: Subscription;
+  private hasPerformanceStats = false;
+  private hasPerformanceSectionIntersected = false;
+  private hasAnimatedPerformanceCounters = false;
   private menuItems: { element: HTMLElement; originalText: string }[] = [];
   private activeAnimations: Set<HTMLElement> = new Set();
 
   constructor(
     private renderer: Renderer2,
     private typingAnimation: TypingAnimationService,
-    private titleAnimationService: TitleAnimationService
+    private titleAnimationService: TitleAnimationService,
+    private deloraStatsService: DeloraStatsService
   ) {}
+
+  ngOnInit(): void {
+    this.performanceStatsSubscription = this.deloraStatsService.getPerformanceStats().subscribe({
+      next: (stats) => {
+        this.performanceStats = stats;
+        this.hasPerformanceStats = true;
+        this.animateLoadedPerformanceCounters();
+      },
+      error: (error) => {
+        console.error('Failed to load Delora performance stats.', error);
+      }
+    });
+  }
 
   ngAfterViewInit(): void {
     this.typingAnimation.initialize(
@@ -60,7 +90,7 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
     const animate = () => {
       currentPosition -= 1.5;
       
-      const totalDistance = (400 + 40) * 27;
+      const totalDistance = chainsTrack.scrollWidth / 2;
       if (currentPosition <= -totalDistance) {
         currentPosition = 0;
       }
@@ -114,11 +144,8 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(1) h1', 24, 0);
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(2) h1', 700, 0, '<', 'ms');
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(3) h1', 8, 0);
-            this.animateCounter('.perfomance-container .perfomance-item:nth-child(4) h1', 99.98, 0, '', '%', true);
-            
+            this.hasPerformanceSectionIntersected = true;
+            this.animateLoadedPerformanceCounters();
             
             this.performanceObserver?.unobserve(entry.target);
           }
@@ -130,6 +157,33 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
     );
 
     this.performanceObserver.observe(performanceSection);
+  }
+
+  private animateLoadedPerformanceCounters(): void {
+    if (
+      !this.hasPerformanceStats ||
+      !this.hasPerformanceSectionIntersected ||
+      this.hasAnimatedPerformanceCounters ||
+      this.performanceStats.supportedBlockchains === undefined ||
+      this.performanceStats.protocolsIntegrated === undefined
+    ) {
+      return;
+    }
+
+    this.hasAnimatedPerformanceCounters = true;
+
+    this.animateCounter(
+      '.perfomance-container .perfomance-item:nth-child(1) h1',
+      this.performanceStats.supportedBlockchains,
+      0
+    );
+    this.animateCounter('.perfomance-container .perfomance-item:nth-child(2) h1', 700, 0, '<', 'ms');
+    this.animateCounter(
+      '.perfomance-container .perfomance-item:nth-child(3) h1',
+      this.performanceStats.protocolsIntegrated,
+      0
+    );
+    this.animateCounter('.perfomance-container .perfomance-item:nth-child(4) h1', 99.98, 0, '', '%', true);
   }
 
   private animateCounter(
@@ -222,17 +276,18 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
       
       
       element.addEventListener('mouseenter', () => {
+        const currentText = element.textContent || originalText;
         
         this.titleAnimationService.clearAnimationForElement(element);
         
         
-        element.textContent = originalText;
+        element.textContent = currentText;
         
         
         this.activeAnimations.add(element);
         this.titleAnimationService.startTitleAnimation(
           element,
-          originalText,
+          currentText,
           {
             animationFrames: 30,
             animationSpeed: 25,
@@ -390,6 +445,7 @@ export class IntroComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.typingAnimation.destroy();
+    this.performanceStatsSubscription?.unsubscribe();
     this.stopAllAnimations();
     
     

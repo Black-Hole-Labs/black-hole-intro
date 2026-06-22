@@ -79,7 +79,7 @@
 	</div>
 
 	<div class="chains">
-		<p class="tag">[ 20+ Supported Chains ]</p>
+		<p class="tag">{{ supportedChainsTag }}</p>
 		<h1>Connected Chains</h1>
 		<div class="chains-container">
 			<div class="chains-track">
@@ -200,7 +200,7 @@
 		<div class="perfomance-container">
 			<div class="perfomance-item">
 				<p>Supported blockchains</p>
-				<h1>24</h1>
+				<h1>{{ performanceStats.supportedBlockchains ?? '--' }}</h1>
 			</div>
 			<div class="perfomance-item">
 				<p>Median Response Time</p>
@@ -208,7 +208,7 @@
 			</div>
 			<div class="perfomance-item">
 				<p>Protocols Integrated</p>
-				<h1>8</h1>
+				<h1>{{ performanceStats.protocolsIntegrated ?? '--' }}</h1>
 			</div>
 			<div class="perfomance-item">
 				<p>API Uptime</p>
