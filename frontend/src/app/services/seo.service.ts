@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router, TitleStrategy } from '@angular/router';
 import { Meta, Title } from '@angular/platform-browser';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
+import seoRoutesConfig from '../seo.routes.json';
 
 interface SeoState {
   canonicalUrl: string;
@@ -15,13 +16,13 @@ interface SeoState {
 
 @Injectable({ providedIn: 'root' })
 export class SeoService {
-  private readonly defaultImagePath = '/img/brand-logo.png';
-  private readonly defaultDescription =
-    'Delora powers cross-chain execution for builders, partners, and communities across modern blockchain ecosystems.';
-  private readonly imageAlt = 'Delora cross-chain execution platform';
-  private readonly siteName = 'Delora';
-  private readonly siteUrl = 'https://delora.build';
-  private readonly socialHandle = '@deloraprotocol';
+  private readonly defaultImagePath = seoRoutesConfig.site.defaultImagePath;
+  private readonly defaultDescription = seoRoutesConfig.site.defaultDescription;
+  private readonly imageAlt = seoRoutesConfig.site.imageAlt;
+  private readonly sameAs = seoRoutesConfig.site.sameAs;
+  private readonly siteName = seoRoutesConfig.site.name;
+  private readonly siteUrl = seoRoutesConfig.site.url;
+  private readonly socialHandle = seoRoutesConfig.site.socialHandle;
   private initialized = false;
 
   constructor(
@@ -156,13 +157,7 @@ export class SeoService {
           name: this.siteName,
           url: `${this.siteUrl}/`,
           logo: this.absoluteUrl('/img/logo.png'),
-          sameAs: [
-            'https://x.com/deloraprotocol',
-            'https://t.me/deloraprotocol',
-            'https://medium.com/@deloraprotocol',
-            'https://www.linkedin.com/company/deloraprotocol',
-            'https://github.com/orgs/DeloraProtocol'
-          ]
+          sameAs: this.sameAs
         },
         {
           '@id': `${this.siteUrl}/#website`,
